@@ -2,10 +2,8 @@ import mediapipe as mp
 import cv2
 import dlib
 
-from scr.color_harmonization import create_palettes
-from scr.create_color_model import save_palette_as_lab, save_colors_as_rgb
-from scr.optimize_colors import monochrome_stretch
-from scr.show_palette import show_palette
+from scr.color_harmonization import create_rgb_palettes
+from scr.Test1.show_palette import show_palette
 
 # Create a MediaPipe pipeline
 face_detection = mp.solutions.face_detection.FaceDetection()
@@ -43,22 +41,24 @@ if results.detections:
             'skin': list(range(1, 18)) + list(range(27, 36))
         }
 
+        all_colors = []
         for part_name, part_landmarks in facial_parts.items():
             part_colors = []
             for landmark_id in part_landmarks:
                 x, y = landmarks.part(landmark_id).x, landmarks.part(landmark_id).y
                 color = image[y, x]
                 part_colors.append(color)
+                all_colors.append(color)
 
             # Display the color palette for the facial part
             show_palette(part_name, part_colors)
 
-            # Save the color palette as RGB values
-            rgb_palette = save_colors_as_rgb(part_colors)
-            #lab_palette = save_palette_as_lab(part_colors)
-            print(f"{part_name} palette (LAB): {rgb_palette}")
+        show_palette('all colors', all_colors)
+        # Save the color palette as LAB values
+        #lab_palette = save_palette_as_lab(part_colors)
+        print(f"all colors: {all_colors}")
 
-            create_palettes(rgb_palette)
+        create_rgb_palettes(all_colors)
 
 # Display the image with facial areas
 cv2.imshow('image', image)

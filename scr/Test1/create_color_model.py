@@ -4,7 +4,7 @@ import numpy as np
 from skimage import color
 
 
-def save_colors_as_rgb(palette):
+def save_palette_as_rgb(palette):
     # Convert LAB values to RGB
     lab_palette = np.array(palette)
     rgb_palette = color.lab2rgb(lab_palette)

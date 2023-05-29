@@ -1,8 +1,10 @@
 import mediapipe as mp
 import cv2
 import dlib
-import numpy as np
 
+from scr.Test1.color_harmonization import create_palettes
+from scr.Test1.create_color_model import save_palette_as_lab
+from scr.Test1.show_palette import show_palette
 
 # Create a MediaPipe pipeline
 face_detection = mp.solutions.face_detection.FaceDetection()
@@ -14,13 +16,12 @@ shape_predictor_model = "/Users/viktoriiasimakova/Documents/GitHub/bachelor-thes
 shape_predictor = dlib.shape_predictor(shape_predictor_model)
 
 # Load and process the image
-absolute_path_image = "/Users/viktoriiasimakova/Documents/GitHub/bachelor-thesis/images/faces/image.jpeg"
+absolute_path_image = "/images/faces/image.jpeg"
 image = cv2.imread(absolute_path_image)
 image_height, image_width, image_channel = image.shape
 
 # Perform face detection using MediaPipe
 results = face_detection.process(image)
-
 
 # Process the detected faces
 if results.detections:
@@ -35,7 +36,7 @@ if results.detections:
 
         # Extract color palettes from different facial parts
         facial_parts = {
-            'eyes': [36, 45],
+            'eyes': [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
             'hair': list(range(0, 17)) + list(range(26, 36)),
             'mouth': list(range(48, 68)),
             'skin': list(range(1, 18)) + list(range(27, 36))
@@ -49,12 +50,13 @@ if results.detections:
                 part_colors.append(color)
 
             # Display the color palette for the facial part
-            palette_height = len(part_colors) * 50
-            palette = np.zeros((palette_height, 50, 3), dtype=np.uint8)
-            for i, color in enumerate(part_colors):
-                palette[i * 50:(i + 1) * 50, :] = color
+            show_palette(part_name, part_colors)
 
-            cv2.imshow(part_name, palette)
+            # Save the color palette as LAB values
+            lab_palette = save_palette_as_lab(part_colors)
+            print(f"{part_name} palette (RGB): {lab_palette}")
+
+            create_palettes(lab_palette)
 
 # Display the image with facial areas
 cv2.imshow('image', image)

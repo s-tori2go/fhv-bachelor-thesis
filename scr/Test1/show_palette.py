@@ -5,7 +5,7 @@ import numpy as np
 def show_palette(title, palette):
     # Determine the number of rows and columns in the palette grid
     num_colors = len(palette)
-    max_columns = 5  # Maximum number of columns in the grid
+    max_columns = 10  # Maximum number of columns in the grid
     num_rows = (num_colors + max_columns - 1) // max_columns
 
     # Calculate the size of each color cell in the grid
