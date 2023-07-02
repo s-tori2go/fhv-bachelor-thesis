@@ -1,6 +1,6 @@
 import numpy as np
 
-from scr.Test1.show_palette import show_palette
+from scr.Dlib_Test2.show_palette import show_palette
 
 
 def create_lab_palettes(lab_palette):

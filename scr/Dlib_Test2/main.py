@@ -2,9 +2,8 @@ import mediapipe as mp
 import cv2
 import dlib
 
-from scr.Test1.color_harmonization import create_palettes
-from scr.Test1.create_color_model import save_palette_as_lab
-from scr.Test1.show_palette import show_palette
+from scr.Dlib_Test2.color_harmonization import create_rgb_palettes
+from scr.Dlib_Test2.show_palette import show_palette
 
 # Create a MediaPipe pipeline
 face_detection = mp.solutions.face_detection.FaceDetection()
@@ -16,7 +15,7 @@ shape_predictor_model = "/Users/viktoriiasimakova/Documents/GitHub/bachelor-thes
 shape_predictor = dlib.shape_predictor(shape_predictor_model)
 
 # Load and process the image
-absolute_path_image = "/images/faces/image.jpeg"
+absolute_path_image = "/Users/viktoriiasimakova/Documents/GitHub/bachelor-thesis/images/faces/image.jpeg"
 image = cv2.imread(absolute_path_image)
 image_height, image_width, image_channel = image.shape
 
@@ -42,21 +41,24 @@ if results.detections:
             'skin': list(range(1, 18)) + list(range(27, 36))
         }
 
+        all_colors = []
         for part_name, part_landmarks in facial_parts.items():
             part_colors = []
             for landmark_id in part_landmarks:
                 x, y = landmarks.part(landmark_id).x, landmarks.part(landmark_id).y
                 color = image[y, x]
                 part_colors.append(color)
+                all_colors.append(color)
 
             # Display the color palette for the facial part
             show_palette(part_name, part_colors)
 
-            # Save the color palette as LAB values
-            lab_palette = save_palette_as_lab(part_colors)
-            print(f"{part_name} palette (RGB): {lab_palette}")
+        show_palette('all colors', all_colors)
+        # Save the color palette as LAB values
+        #lab_palette = save_palette_as_lab(part_colors)
+        print(f"all colors: {all_colors}")
 
-            create_palettes(lab_palette)
+        create_rgb_palettes(all_colors)
 
 # Display the image with facial areas
 cv2.imshow('image', image)
