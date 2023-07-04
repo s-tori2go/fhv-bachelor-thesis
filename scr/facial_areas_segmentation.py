@@ -30,7 +30,7 @@ with mp_face_mesh.FaceMesh(
         refine_landmarks=True,
         min_detection_confidence=0.5) as face_mesh:
     # Read image file with cv2 and process with face_mesh
-    path_image = '../images/faces/image2.JPG'
+    path_image = '../images/faces/image3.png'
     image = cv2.imread(path_image)
     cv2.imshow("Image", image)
     results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -99,37 +99,31 @@ if face_found:
 
     # https://www.youtube.com/watch?v=vE3IKPnztek
     landmarks = results.multi_face_landmarks[0]
-    face_oval = mp_face_mesh.FACEMESH_FACE_OVAL
-    df = pd.DataFrame(list(face_oval), columns=["p1", "p2"])
-    print(df)
-    routes_idx = []
 
+for area_name, area_indices in facial_areas.items():
+    # Create a DataFrame for the current facial area
+    df = pd.DataFrame(list(area_indices), columns=["p1", "p2"])
+
+    # Initialize variables
+    routes_idx = []
     p1 = df.iloc[0]["p1"]
     p2 = df.iloc[0]["p2"]
 
-    for i in range(0, df.shape[0]):
+    for i in range(df.shape[0]):
         obj = df[df["p1"] == p2]
-        print(obj)
         if not obj.empty:
             p1 = obj["p1"].values[0]
-            print(p1)
             p2 = obj["p2"].values[0]
-            print(p2)
         else:
             break
-        print(obj)
 
-        current_route = []
-        current_route.append(p1)
-        current_route.append(p2)
+        current_route = [p1, p2]
         routes_idx.append(current_route)
-
-    print(routes_idx[0:5])
 
     routes = []
     for source_idx, target_idx in routes_idx:
-        source = landmarks.landmark[source_idx]
-        target = landmarks.landmark[target_idx]
+        source = landmarks.landmark[int(source_idx)]
+        target = landmarks.landmark[int(target_idx)]
 
         relative_source = (int(source.x * image.shape[1]), int(source.y * image.shape[0]))
         relative_target = (int(target.x * image.shape[1]), int(target.y * image.shape[0]))
@@ -137,14 +131,14 @@ if face_found:
         routes.append(relative_source)
         routes.append(relative_target)
 
-    mask = np.zeros((image.shape[0], image.shape[1]))
+    mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
     mask = cv2.fillConvexPoly(mask, np.array(routes), 1)
     mask = mask.astype(bool)
 
     segmented_image = np.zeros_like(image)
     segmented_image[mask] = image[mask]
 
-    cv2.imwrite(f'../images/processed/face_oval_segmented.jpg', segmented_image)
+    cv2.imwrite(f'../images/processed/{area_name}_segmented.jpg', segmented_image)
 
 # Open image
 img = cv2.imread('../images/processed/face_oval_segmented.jpg')

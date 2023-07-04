@@ -12,7 +12,12 @@ from scipy.spatial import KDTree
 from webcolors import hex_to_name, hex_to_rgb, CSS3_HEX_TO_NAMES
 
 
-def exact_color(input_image, resize, tolerance, zoom):
+# exact_color('../images/faces/image2.JPG', 900, 12, 0.9)
+# exact_color('../images/faces/image2.JPG', 900, 24, 2.5)
+# exact_color('../images/faces/image2.JPG', 900, 36, 2.5)
+# exact_color('../images/faces/image2.JPG', 900, 24, 4.5)
+# def exact_color(input_image, resize, tolerance, zoom):
+def exact_color():
     # background
     bg = 'bg.png'
     fig, ax = plt.subplots(figsize=(192, 108), dpi=10)
@@ -21,26 +26,36 @@ def exact_color(input_image, resize, tolerance, zoom):
     plt.close(fig)
 
     # resize
-    output_width = resize
-    img = Image.open(input_image)
-    if img.size[0] >= resize:
-        wpercent = (output_width / float(img.size[0]))
-        hsize = int((float(img.size[1]) * float(wpercent)))
-        img = img.resize((output_width, hsize), Image.LANCZOS)
-        resize_name = '../images/processed/resized_color_extraction.png'
-        img.save(resize_name)
-    else:
-        resize_name = input_image
+    # output_width = resize
+    # img = Image.open(input_image)
+    # if img.size[0] >= resize:
+    #     wpercent = (output_width / float(img.size[0]))
+    #     hsize = int((float(img.size[1]) * float(wpercent)))
+    #     img = img.resize((output_width, hsize), Image.LANCZOS)
+    #     resize_name = '../images/processed/resized_color_extraction.png'
+    #     img.save(resize_name)
+    # else:
+    #     resize_name = input_image
 
-    # Create dataframe
-    img_url = input_image
-    colors_x = extcolors.extract_from_path(img_url, tolerance=tolerance, limit=13)
-    df_color = color_to_df(colors_x)
+    # Read the images
+    img_url_face = cv2.imread('../images/processed/Face_oval_segmented.jpg')
+    img_url_hair = cv2.imread('../images/processed/hair_segmented.png')
+
+    # Combine the images horizontally
+    combined_image = cv2.hconcat([img_url_face, img_url_hair])
+
+    # Save the combined image to a file
+    combined_image_path = '../images/processed/General_segmented.jpg'
+    cv2.imwrite(combined_image_path, combined_image)
+
+    # Extract colors from the combined image
+    colors = extcolors.extract_from_path(combined_image_path, tolerance=12, limit=13)
+    df_color = color_to_df(colors)
 
     # Annotate text
     list_color = list(df_color['c_code'])
     list_color_name = list(df_color['c_name'])
-    list_precent = [int(i) for i in list(df_color['occurence'])]
+    list_precent = [int(i) for i in list(df_color['occurrence'])]
     text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color, list_precent)]
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(160, 120), dpi=10)
 
@@ -53,10 +68,10 @@ def exact_color(input_image, resize, tolerance, zoom):
     plt.setp(wedges, width=0.3)
 
     # add image in the center of donut plot
-    img = mpimg.imread(resize_name)
-    imagebox = OffsetImage(img, zoom=zoom)
-    ab = AnnotationBbox(imagebox, (0, 0))
-    ax1.add_artist(ab)
+    # img = mpimg.imread(resize_name)
+    # imagebox = OffsetImage(img, zoom=zoom)
+    # ab = AnnotationBbox(imagebox, (0, 0))
+    # ax1.add_artist(ab)
 
     # color palette
     x_posi, y_posi, y_posi2 = 160, -170, -170
@@ -91,7 +106,7 @@ def exact_color(input_image, resize, tolerance, zoom):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    return img
+    return df_color['c_rgb']
 
 
 def color_to_df(input):
@@ -99,6 +114,13 @@ def color_to_df(input):
     df_rgb_tuples = [tuple(map(int, i.split('), ')[0].replace('(', '').split(', '))) for i in colors_pre_list]
     df_rgb = [i.split('), ')[0] + ')' for i in colors_pre_list]
     df_percent = [i.split('), ')[1].replace(')', '') for i in colors_pre_list]
+
+    # Exclude black color
+    black_index = [i for i, color in enumerate(df_rgb_tuples) if color == (0, 0, 0)]
+    df_rgb_tuples = [color for i, color in enumerate(df_rgb_tuples) if i not in black_index]
+    df_rgb = [color for i, color in enumerate(df_rgb) if i not in black_index]
+    df_percent = [percent for i, percent in enumerate(df_percent) if i not in black_index]
+
     # Convert RGB to HEX code
     df_color_up = [rgb2hex(int(i.split(", ")[0].replace("(", "")),
                            int(i.split(", ")[1]),
@@ -106,9 +128,8 @@ def color_to_df(input):
 
     # Get color names
     color_names = [rgb_to_name(color) for color in df_rgb_tuples]
-    print(color_names)
 
-    df = pd.DataFrame(zip(df_color_up, color_names, df_percent), columns=['c_code', 'c_name', 'occurence'])
+    df = pd.DataFrame(zip(df_rgb, df_color_up, color_names, df_percent), columns=['c_rgb', 'c_code', 'c_name', 'occurrence'])
     return df
 
 
@@ -124,8 +145,3 @@ def rgb_to_name(rgb_tuple):
     kdt_db = KDTree(rgb_values)
     distance, index = kdt_db.query(rgb_tuple)
     return names[index] if index is not None else None
-
-exact_color('../images/faces/image2.JPG', 900, 12, 0.9)
-# exact_color('../images/faces/image2.JPG', 900, 24, 2.5)
-# exact_color('../images/faces/image2.JPG', 900, 36, 2.5)
-# exact_color('../images/faces/image2.JPG', 900, 24, 4.5)

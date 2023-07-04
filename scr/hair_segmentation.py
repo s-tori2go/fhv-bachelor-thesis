@@ -38,10 +38,10 @@ with ImageSegmenter.create_from_options(options) as segmenter:
     output_image = np.where(condition, image_data, [0, 0, 0])
 
     print(f'Blurred background of {path_image}:')
-    cv2.imwrite('../images/processed/hair_segmentation.png', output_image)
+    cv2.imwrite('../images/processed/hair_segmented.png', output_image)
 
 # Open image
-img = cv2.imread('../images/processed/hair_segmentation.png')
+img = cv2.imread('../images/processed/hair_segmented.png')
 cv2.imshow("segmentation", img)
 
 cv2.waitKey(0)
