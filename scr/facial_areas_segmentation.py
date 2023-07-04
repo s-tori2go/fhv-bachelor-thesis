@@ -7,9 +7,11 @@ import numpy as np
 import pickle
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib import animation
 # import PyQt5
 from PIL import Image
+
 # from IPython.display import Video
 # import nb_helpers
 
@@ -27,7 +29,6 @@ with mp_face_mesh.FaceMesh(
         max_num_faces=1,
         refine_landmarks=True,
         min_detection_confidence=0.5) as face_mesh:
-
     # Read image file with cv2 and process with face_mesh
     path_image = '../images/faces/image2.JPG'
     image = cv2.imread(path_image)
@@ -52,10 +53,6 @@ if face_found:
 
     # Save image
     cv2.imwrite('../images/processed/face_tesselation_only.png', annotated_image)
-
-# Open image
-img = cv2.imread('../images/processed/face_tesselation_only.png')
-cv2.imshow("face_tesselation_only", img)
 
 if face_found:
     # Create a copy of the image
@@ -84,7 +81,6 @@ if face_found:
     # Save the image
     cv2.imwrite('../images/processed/face_contours_and_irises.png', annotated_image)
 
-
 if face_found:
     facial_areas = {
         'Contours': mp_face_mesh.FACEMESH_CONTOURS
@@ -101,9 +97,58 @@ if face_found:
         , 'Nose': mp_face_mesh.FACEMESH_NOSE
     }
 
+    # https://www.youtube.com/watch?v=vE3IKPnztek
+    landmarks = results.multi_face_landmarks[0]
+    face_oval = mp_face_mesh.FACEMESH_FACE_OVAL
+    df = pd.DataFrame(list(face_oval), columns=["p1", "p2"])
+    print(df)
+    routes_idx = []
+
+    p1 = df.iloc[0]["p1"]
+    p2 = df.iloc[0]["p2"]
+
+    for i in range(0, df.shape[0]):
+        obj = df[df["p1"] == p2]
+        print(obj)
+        if not obj.empty:
+            p1 = obj["p1"].values[0]
+            print(p1)
+            p2 = obj["p2"].values[0]
+            print(p2)
+        else:
+            break
+        print(obj)
+
+        current_route = []
+        current_route.append(p1)
+        current_route.append(p2)
+        routes_idx.append(current_route)
+
+    print(routes_idx[0:5])
+
+    routes = []
+    for source_idx, target_idx in routes_idx:
+        source = landmarks.landmark[source_idx]
+        target = landmarks.landmark[target_idx]
+
+        relative_source = (int(source.x * image.shape[1]), int(source.y * image.shape[0]))
+        relative_target = (int(target.x * image.shape[1]), int(target.y * image.shape[0]))
+
+        routes.append(relative_source)
+        routes.append(relative_target)
+
+    mask = np.zeros((image.shape[0], image.shape[1]))
+    mask = cv2.fillConvexPoly(mask, np.array(routes), 1)
+    mask = mask.astype(bool)
+
+    segmented_image = np.zeros_like(image)
+    segmented_image[mask] = image[mask]
+
+    cv2.imwrite(f'../images/processed/face_oval_segmented.jpg', segmented_image)
+
 # Open image
-img = cv2.imread('../images/processed/face_contours_and_irises.png')
-cv2.imshow("face_contours_and_irises", img)
+img = cv2.imread('../images/processed/face_oval_segmented.jpg')
+cv2.imshow("face_oval_segmented", img)
 
 
 cv2.waitKey(0)
