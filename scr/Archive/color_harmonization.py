@@ -2,7 +2,7 @@ import colorsys
 import numpy as np
 import math
 
-from scr.convert_colors import rgb2hsv, hsv2rgb
+from scr.Archive.color_conversion import rgb2hsv, hsv2rgb
 
 
 def create_complementary_palette(rgb_palette):
@@ -13,7 +13,7 @@ def create_complementary_palette(rgb_palette):
     complementary_palette[:, 0] = (complementary_palette[:, 0] + 180) % 360
     # print(f"complementary_palette hsv: {complementary_palette}")
     complementary_palette = hsv2rgb(complementary_palette)
-    print(f"complementary_palette rgb: {complementary_palette}")
+    # print(f"complementary_palette rgb: {complementary_palette}")
 
     return complementary_palette
 
@@ -42,7 +42,7 @@ def create_analogous_palette(rgb_palette):
     analogous_palette = np.concatenate((analogous_palette1, analogous_palette2), axis=0)
     # print(f"analogous_palette hsv: {analogous_palette}")
     analogous_palette = hsv2rgb(analogous_palette)
-    print(f"analogous_palette rgb: {analogous_palette}")
+    # print(f"analogous_palette rgb: {analogous_palette}")
 
     return analogous_palette
 
@@ -58,7 +58,7 @@ def create_triadic_palette(rgb_palette):
     triadic_palette = np.concatenate((triadic_palette1, triadic_palette2), axis=0)
     # print(f"triadic_palette hsv: {triadic_palette}")
     triadic_palette = hsv2rgb(triadic_palette)
-    print(f"triadic_palette rgb: {triadic_palette}")
+    # print(f"triadic_palette rgb: {triadic_palette}")
 
     return triadic_palette
 
@@ -74,7 +74,7 @@ def create_split_complementary_palette(rgb_palette):
     split_complementary_palette = np.concatenate((split_complementary_palette1, split_complementary_palette2), axis=0)
     # print(f"split_complementary_palette hsv: {split_complementary_palette}")
     split_complementary_palette = hsv2rgb(split_complementary_palette)
-    print(f"split_complementary_palette rgb: {split_complementary_palette}")
+    # print(f"split_complementary_palette rgb: {split_complementary_palette}")
 
     return split_complementary_palette
 
@@ -90,7 +90,7 @@ def create_square_palette(rgb_palette):
     square_palette = np.concatenate((square_palette1, square_palette2), axis=0)
     # print(f"square_palette hsv: {square_palette}")
     square_palette = hsv2rgb(square_palette)
-    print(f"square_palette rgb: {square_palette}")
+    # print(f"square_palette rgb: {square_palette}")
 
     return square_palette
 
@@ -106,7 +106,7 @@ def create_tetradic_palette(rgb_palette):
     tetradic_palette = np.concatenate((tetradic_palette1, tetradic_palette2), axis=0)
     # print(f"tetradic_palette hsv: {tetradic_palette}")
     tetradic_palette = hsv2rgb(tetradic_palette)
-    print(f"tetradic_palette rgb: {tetradic_palette}")
+    # print(f"tetradic_palette rgb: {tetradic_palette}")
 
     return tetradic_palette
 
@@ -115,7 +115,7 @@ def create_tetradic_palette(rgb_palette):
 # https://dev.to/madsstoumann/colors-are-math-how-they-match-and-how-to-build-a-color-picker-4ei8
 # http://bahamas10.github.io/ryb/
 def create_rgb_palettes(rgb_palette):
-    print(f"rgb_palette: {rgb_palette}")
+    # print(f"rgb_palette: {rgb_palette}")
     generated_palettes = []
 
     complementary_palette = create_complementary_palette(rgb_palette)
@@ -131,6 +131,5 @@ def create_rgb_palettes(rgb_palette):
     generated_palettes.extend(split_complementary_palette)
     # generated_palettes.extend(tetradic_palette)
     # generated_palettes.extend(square_palette)
-    print(f"generated palettes: {generated_palettes}")
 
     return generated_palettes

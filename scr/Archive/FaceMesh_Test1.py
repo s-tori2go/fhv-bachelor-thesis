@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 
-from scr.color_harmonization import create_rgb_palettes
+from scr.Archive.color_harmonization import create_rgb_palettes
 from scr.Dlib_Test2.show_palette import show_palette
-from scr.convert_colors import rgb2bgr, bgr2rgb
+from scr.Archive.color_conversion import rgb2bgr, bgr2rgb
 
 
 # https://github.com/serengil/tensorflow-101/blob/master/python/Mediapipe-Face-Detector.ipynb
@@ -76,7 +76,7 @@ face_mesh = faceModule.FaceMesh(static_image_mode=True, max_num_faces=2, min_det
 drawSpec = mpDraw.DrawingSpec(thickness=1, circle_radius=1)
 
 # Load and process the image
-absolute_path_image = "/Users/viktoriiasimakova/Documents/GitHub/bachelor-thesis/images/faces/image2.JPG"
+absolute_path_image = "/images/faces/image2.JPG"
 image_base = cv2.imread(absolute_path_image)
 image = image_base.copy()
 imageWithLandmarks = cv2.imread(absolute_path_image)

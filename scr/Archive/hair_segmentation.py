@@ -7,7 +7,7 @@ from mediapipe.tasks import python
 # https://developers.google.com/mediapipe/solutions/vision/image_segmenter/python
 # https://github.com/googlesamples/mediapipe/blob/main/examples/image_segmentation/python/image_segmentation.ipynb
 
-path_image = '../images/faces/image3.png'
+path_image = '../../images/faces/image3.png'
 
 BaseOptions = mp.tasks.BaseOptions
 ImageSegmenter = mp.tasks.vision.ImageSegmenter
@@ -16,7 +16,7 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 
 # Create an image segmenter instance with the image mode
 options = ImageSegmenterOptions(
-    base_options=BaseOptions(model_asset_path='../models/selfie_multiclass_256x256.tflite'),
+    base_options=BaseOptions(model_asset_path='../../models/selfie_multiclass_256x256.tflite'),
     running_mode=VisionRunningMode.IMAGE,
     output_category_mask=True)
 with ImageSegmenter.create_from_options(options) as segmenter:

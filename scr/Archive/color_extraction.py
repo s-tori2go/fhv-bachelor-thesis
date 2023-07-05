@@ -45,7 +45,7 @@ def exact_color():
     combined_image = cv2.hconcat([img_url_face, img_url_hair])
 
     # Save the combined image to a file
-    combined_image_path = '../images/processed/General_segmented.jpg'
+    combined_image_path = '../../images/processed/General_segmented.jpg'
     cv2.imwrite(combined_image_path, combined_image)
 
     # Extract colors from the combined image
@@ -94,7 +94,7 @@ def exact_color():
     plt.tight_layout()
 
     # Save the figure as an image
-    output_filename = '../images/processed/color_extraction.png'
+    output_filename = '../../images/processed/color_extraction.png'
     plt.savefig(output_filename)
     plt.close(fig)
 
@@ -130,6 +130,28 @@ def color_to_df(input):
     color_names = [rgb_to_name(color) for color in df_rgb_tuples]
 
     df = pd.DataFrame(zip(df_rgb, df_color_up, color_names, df_percent), columns=['c_rgb', 'c_code', 'c_name', 'occurrence'])
+    return df
+
+
+def palette_to_df(input):
+    colors_pre_list = [str(tuple(color)) for color in input]
+    df_rgb_tuples = [tuple(map(int, i.replace('(', '').replace(')', '').split(', '))) for i in colors_pre_list]
+    df_rgb = [i for i in colors_pre_list]
+
+    # Exclude black color
+    black_index = [i for i, color in enumerate(df_rgb_tuples) if color == (0, 0, 0)]
+    df_rgb_tuples = [color for i, color in enumerate(df_rgb_tuples) if i not in black_index]
+    df_rgb = [color for i, color in enumerate(df_rgb) if i not in black_index]
+
+    # Convert RGB to HEX code
+    df_color_up = [rgb2hex(int(i.split(", ")[0].replace("(", "")),
+                           int(i.split(", ")[1]),
+                           int(i.split(", ")[2].replace(")", ""))) for i in df_rgb]
+
+    # Get color names
+    color_names = [rgb_to_name(color) for color in df_rgb_tuples]
+
+    df = pd.DataFrame(zip(df_rgb, df_color_up, color_names), columns=['c_rgb', 'c_code', 'c_name'])
     return df
 
 

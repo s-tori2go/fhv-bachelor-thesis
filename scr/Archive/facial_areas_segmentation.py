@@ -30,7 +30,7 @@ with mp_face_mesh.FaceMesh(
         refine_landmarks=True,
         min_detection_confidence=0.5) as face_mesh:
     # Read image file with cv2 and process with face_mesh
-    path_image = '../images/faces/image3.png'
+    path_image = '../../images/faces/image3.png'
     image = cv2.imread(path_image)
     cv2.imshow("Image", image)
     results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
