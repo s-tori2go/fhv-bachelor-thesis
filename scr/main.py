@@ -1,30 +1,18 @@
 # https://www.assemblyai.com/blog/mediapipe-for-dummies/
 
 import cv2
-import mediapipe as mp
-import urllib.request
-import numpy as np
-import pickle
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import pandas as pd
-from matplotlib import animation
-# import PyQt5
-from PIL import Image
-from mediapipe.tasks import python
-import matplotlib.patches as patches
-import matplotlib.image as mpimg
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import extcolors
-from colormap import rgb2hex
-from scipy.spatial import KDTree
-from webcolors import hex_to_name, hex_to_rgb, CSS3_HEX_TO_NAMES
+import matplotlib.image as mpimg
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import mediapipe as mp
+import numpy as np
+import pandas as pd
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from mediapipe.tasks import python
 
 from scr.Archive.color_extraction import color_to_df, palette_to_df
 from scr.Archive.color_harmonization import create_rgb_palettes
-
-# from IPython.display import Video
-# import nb_helpers
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -33,7 +21,7 @@ mp_pose = mp.solutions.pose
 mp_face_mesh = mp.solutions.face_mesh
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-path_image = '../images/faces/image3.png'
+path_image = '../images/faces/image8.png'
 
 BaseOptions = mp.tasks.BaseOptions
 ImageSegmenter = mp.tasks.vision.ImageSegmenter
@@ -168,35 +156,25 @@ rgb_list = [[int(val) for val in rgb.strip('()').split(',')] for rgb in rgb_arra
 list_color = list(df_color['c_code'])
 list_color_name = list(df_color['c_name'])
 list_precent = [int(i) for i in list(df_color['occurrence'])]
-text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color, list_precent)]
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(160, 120), dpi=10)
+text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color_name, list_precent)]
 
 # Create donut plot
-wedges, text = ax1.pie(list_precent,
-                       labels=text_c,
-                       labeldistance=1.05,
-                       colors=list_color,
-                       textprops={'fontsize': 150, 'color': 'black'})
+fig, ax = plt.subplots(figsize=(108, 108), dpi=10)
+
+img = mpimg.imread(path_image)
+imagebox = OffsetImage(img, zoom=0.7)
+ab = AnnotationBbox(imagebox, (0, 0))
+ax.add_artist(ab)
+
+wedges, text = ax.pie(list_precent,
+                      labels=text_c,
+                      labeldistance=1.05,
+                      colors=list_color,
+                      textprops={'fontsize': 150, 'color': 'black'})
 plt.setp(wedges, width=0.3)
 
-# color palette
-x_posi, y_posi, y_posi2 = 160, -170, -170
-for c in list_color:
-    if list_color.index(c) <= 5:
-        y_posi += 180
-        rect = patches.Rectangle((x_posi, y_posi), 360, 160, facecolor=c)
-        ax2.add_patch(rect)
-        ax2.text(x=x_posi + 400, y=y_posi + 100, s=list_color_name[list_color.index(c)], fontdict={'fontsize': 180})
-    else:
-        y_posi2 += 180
-        rect = patches.Rectangle((x_posi + 1000, y_posi2), 360, 160, facecolor=c)
-        ax2.add_artist(rect)
-        ax2.text(x=x_posi + 1400, y=y_posi2 + 100, s=list_color_name[list_color.index(c)], fontdict={'fontsize': 180})
-
 fig.set_facecolor('white')
-ax2.axis('off')
-bg = plt.imread('bg.png')
-plt.imshow(bg)
+ax.axis('off')
 plt.tight_layout()
 
 # Save the figure as an image
@@ -205,7 +183,6 @@ plt.savefig(output_filename)
 plt.close(fig)
 img = cv2.imread(output_filename)
 cv2.imshow(output_filename, img)
-
 
 generated_palettes = create_rgb_palettes(rgb_list)
 df_generated_palettes = palette_to_df(generated_palettes)
@@ -216,20 +193,20 @@ list_color = list(df_generated_palettes['c_code'])
 list_color_name = list(df_generated_palettes['c_name'])
 
 # Color palette
-fig, ax = plt.subplots(figsize=(30, 20))
-x_posi, y_posi = 160, 70
-rect_width = 60
-rect_height = 60
-x_spacing = 200
-y_spacing = 20
-text_spacing = 10
+fig, ax = plt.subplots(figsize=(108, 108), dpi=10)
+x_posi, y_posi = 40, 40
+rect_width = 110
+rect_height = 50
+x_spacing = 110
+y_spacing = 38
+text_spacing = 15
 
 column_count = 0
 for c in list_color:
     rect = patches.Rectangle((x_posi, y_posi), rect_width, rect_height, facecolor=c)
     ax.add_patch(rect)
-    ax.text(x=x_posi + rect_width + text_spacing, y=y_posi + rect_height / 2, s=list_color_name[list_color.index(c)],
-            fontdict={'fontsize': 18})
+    ax.text(x=x_posi, y=y_posi + rect_width / 2 + text_spacing,
+            s=list_color_name[list_color.index(c)], fontdict={'fontsize': 150})
 
     y_posi += rect_height + y_spacing
     column_count += 1
@@ -237,15 +214,16 @@ for c in list_color:
     if column_count >= 11:
         column_count = 0
         x_posi += rect_width + x_spacing
-        y_posi = 70
+        y_posi = 40
+
+plt.axis('off')
 
 # Customize the appearance
 fig.set_facecolor('white')
 ax.axis('off')
-bg = plt.imread('bg.png')
+bg = plt.imread('../images/bg.png')
 plt.imshow(bg)
 plt.tight_layout()
-
 
 # Save the figure as an image
 output_filename = '../images/processed/palettes_generated.png'
@@ -256,3 +234,5 @@ cv2.imshow(output_filename, img)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+mp_face_mesh.close()
