@@ -157,6 +157,7 @@ def palette_to_df(input):
 
 def rgb_to_name(rgb_tuple):
     # a dictionary of all the hex and their respective names in css3
+    # alternative idea: https://towardsdatascience.com/building-a-color-recognizer-in-python-4783dfc72456
     css3_db = CSS3_HEX_TO_NAMES
     names = []
     rgb_values = []

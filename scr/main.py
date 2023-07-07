@@ -21,7 +21,7 @@ mp_pose = mp.solutions.pose
 mp_face_mesh = mp.solutions.face_mesh
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-path_image = '../images/faces/image8.png'
+path_image = '../images/faces/21181.png'
 
 BaseOptions = mp.tasks.BaseOptions
 ImageSegmenter = mp.tasks.vision.ImageSegmenter
@@ -159,10 +159,10 @@ list_precent = [int(i) for i in list(df_color['occurrence'])]
 text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color_name, list_precent)]
 
 # Create donut plot
-fig, ax = plt.subplots(figsize=(108, 108), dpi=10)
+fig, ax = plt.subplots(figsize=(108, 108))
 
 img = mpimg.imread(path_image)
-imagebox = OffsetImage(img, zoom=0.7)
+imagebox = OffsetImage(img, zoom=2.3)# 0.7)
 ab = AnnotationBbox(imagebox, (0, 0))
 ax.add_artist(ab)
 
