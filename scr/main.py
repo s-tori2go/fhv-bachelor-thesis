@@ -21,7 +21,7 @@ mp_pose = mp.solutions.pose
 mp_face_mesh = mp.solutions.face_mesh
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-path_image = '../images/faces/image_a.png'
+path_image = '../images/faces/image_i.png'
 
 BaseOptions = mp.tasks.BaseOptions
 ImageSegmenter = mp.tasks.vision.ImageSegmenter
